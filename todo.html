@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List</title>
+
+  <style>
+    body {
+      background: #0d1117;
+      color: #e6edf3;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+    .box { width: 100%; max-width: 420px; }
+    h1 { margin-bottom: 16px; }
+
+    .add-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    #task-input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #8b949e;
+      background: #161b22;
+      color: #e6edf3;
+    }
+    #add-btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #58a6ff;
+      color: #0d1117;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    ul { list-style: none; }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #161b22;
+      border: 1px solid #8b949e;
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    li.done span { text-decoration: line-through; opacity: 0.5; }
+    li button {
+      background: none;
+      border: none;
+      color: #ff7b72;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #msg { color: #ff7b72; min-height: 1.4em; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h1>My To-Do List</h1>
+
+    <div class="add-row">
+      <input type="text" id="task-input" placeholder="Add a task...">
+      <button id="add-btn">Add</button>
+    </div>
+
+    <p id="msg"></p>
+
+    
+
+    <!-- Tasks yahan JS se aayenge -->
+    <ul id="task-list"></ul>
+  </div>
+
+  <script>
+    // HTML ki cheezein pakad lo
+    const input = document.getElementById("task-input");
+    const addBtn = document.getElementById("add-btn");
+    const list = document.getElementById("task-list");
+    const msg = document.getElementById("msg");
+
+    // Task add karne wala function
+    function addTask() {
+      const text = input.value.trim();
+
+      // Khali task allow nahi
+      if (text === "") {
+        msg.textContent = "Please write a task first.";
+        return;
+      }
+      msg.textContent = "";
+
+      // Naya <li> banao (list ki ek line)
+      const li = document.createElement("li");
+
+      // Task ka text
+      const span = document.createElement("span");
+      span.textContent = text;
+
+      // Delete button
+      const del = document.createElement("button");
+      del.textContent = "✕";
+
+      // Task pe click = done / not done (line cut ho jaati hai)
+      li.addEventListener("click", function () {
+        li.classList.toggle("done");
+      });
+
+      // Delete pe click = task hata do
+      del.addEventListener("click", function (event) {
+        event.stopPropagation();   // taaki li ka click event na chale
+        li.remove();
+      });
+
+      // Ek ke andar ek daalo: span aur del -> li ke andar, li -> list ke andar
+      li.appendChild(span);
+      li.appendChild(del);
+      list.appendChild(li);
+
+      // Input saaf kar do
+      input.value = "";
+    }
+
+    // Add button dabane pe task add
+    addBtn.addEventListener("click", addTask);
+
+    // Enter dabane pe bhi task add
+    input.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        addTask();
+      }
+    });
+  </script>
+
+</body>
+</html>
