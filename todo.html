@@ -71,70 +71,86 @@
 
     <p id="msg"></p>
 
-    
-
     <!-- Tasks yahan JS se aayenge -->
     <ul id="task-list"></ul>
   </div>
 
   <script>
-    // HTML ki cheezein pakad lo
     const input = document.getElementById("task-input");
     const addBtn = document.getElementById("add-btn");
     const list = document.getElementById("task-list");
     const msg = document.getElementById("msg");
 
-    // Task add karne wala function
+    // Browser me pehle se saved tasks nikalo, nahi hain to khali list
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+    // Tasks ko browser me save karo
+    function saveTasks() {
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    // List se page pe tasks dikhao
+    function showTasks() {
+      list.innerHTML = "";   // pehle purani list saaf
+
+      tasks.forEach(function (task, index) {
+        const li = document.createElement("li");
+        if (task.done) {
+          li.classList.add("done");
+        }
+
+        const span = document.createElement("span");
+        span.textContent = task.text;
+
+        const del = document.createElement("button");
+        del.textContent = "✕";
+
+        // Click = done / not done badlo
+        li.addEventListener("click", function () {
+          tasks[index].done = !tasks[index].done;
+          saveTasks();
+          showTasks();
+        });
+
+        // ✕ = task hata do
+        del.addEventListener("click", function (event) {
+          event.stopPropagation();
+          tasks.splice(index, 1);
+          saveTasks();
+          showTasks();
+        });
+
+        li.appendChild(span);
+        li.appendChild(del);
+        list.appendChild(li);
+      });
+    }
+
     function addTask() {
       const text = input.value.trim();
 
-      // Khali task allow nahi
       if (text === "") {
         msg.textContent = "Please write a task first.";
         return;
       }
       msg.textContent = "";
 
-      // Naya <li> banao (list ki ek line)
-      const li = document.createElement("li");
-
-      // Task ka text
-      const span = document.createElement("span");
-      span.textContent = text;
-
-      // Delete button
-      const del = document.createElement("button");
-      del.textContent = "✕";
-
-      // Task pe click = done / not done (line cut ho jaati hai)
-      li.addEventListener("click", function () {
-        li.classList.toggle("done");
-      });
-
-      // Delete pe click = task hata do
-      del.addEventListener("click", function (event) {
-        event.stopPropagation();   // taaki li ka click event na chale
-        li.remove();
-      });
-
-      // Ek ke andar ek daalo: span aur del -> li ke andar, li -> list ke andar
-      li.appendChild(span);
-      li.appendChild(del);
-      list.appendChild(li);
-
-      // Input saaf kar do
+      tasks.push({ text: text, done: false });
+      saveTasks();
+      showTasks();
       input.value = "";
     }
 
-    // Add button dabane pe task add
     addBtn.addEventListener("click", addTask);
 
-    // Enter dabane pe bhi task add
     input.addEventListener("keydown", function (event) {
       if (event.key === "Enter") {
         addTask();
       }
     });
+
+    // Page khulte hi saved tasks dikha do
+    showTasks();
   </script>
 
 </body>
